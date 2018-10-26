@@ -3,14 +3,14 @@
 #include <iostream>
 #include <vector>
 using namespace std;
-class Subject;
+class Sensor;
 
 class Observer {
     // 2. "dependent" functionality
 
   public:
+//    void registerSubject(Subject* sb);
+    virtual void update(Sensor* x) =0;
     Observer();
-    virtual void update(Subject* const x) = 0;
-    void registerSubject(Subject* sb);
 };
 #endif

@@ -10,7 +10,7 @@ using namespace std;
 class FileSaver : public Observer {
   public:
     FileSaver(string path);
-    void update(Subject* const x);
+    void update(void* const x);
   private:
     //void save(string to_save);
     fstream file;

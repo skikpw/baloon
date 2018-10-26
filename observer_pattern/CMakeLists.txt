@@ -6,8 +6,9 @@ project(Obserwator)
 #set(SOURCES main.cpp)
 add_library(ObserverHead 
 	Subject.cpp
-	FileSaver.cpp
-	MHZ14A-co2/CarbonDioxideSensor.cpp
+		#FileSaver.cpp
+		#MHZ14A-co2/CarbonDioxideSensor.cpp
+	Sensor.h
 	Observer.cpp)
 
 add_executable(data_acquirer main.cpp)

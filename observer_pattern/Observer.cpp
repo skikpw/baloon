@@ -4,13 +4,13 @@
 Observer::Observer() {
   // 4. Observer register themselve with subject
 }
-
-Subject* Observer::getSubject(){
-  return model;
-}
-
-
-Subject* Observer::registerSubject(Subject* sb)
-{
-  sb->attach(this);
-}
+//
+//Subject* Observer::getSubject(){
+//  return model;
+//}
+//
+//
+//Subject* Observer::registerSubject(Subject* sb)
+//{
+//  sb->attach(this);
+//}
