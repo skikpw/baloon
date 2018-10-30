@@ -1,12 +1,10 @@
-/*
- * blink.c:
- *      blinks the first LED
- *      Gordon Henderson, projects@drogon.net
- */
 
 #include <stdio.h>
+#include <cstdlib>
 //#include <pthread.h>
 #include <ctime>
+#include <cerrno>
+#include <cstring>
 #include <unistd.h>
 #include <wiringPi.h>
 #define NUM_THREADS     2
@@ -40,18 +38,18 @@ int main (void)
 //    if (pthread_create(&watek, NULL, interrupt_monitor, 0))
 //        printf("Error creating a thread.\n");
 
-    if ( wiringPiISR (25, INT_EDGE_FALLING, &myInterrupt) < 0 ) {
+    if ( wiringPiISR (25, INT_EDGE_BOTH, &myInterrupt) < 0 ) {
         printf ("Unable to setup ISR: %s\n", strerror (errno));
         return 1;
     }
-
+int licznik=0;
     while(1) {
         if(flag == 1) {
             flag = 0;
-            usleep(1000000);
-            printf("Odczytalem 1\n");
+            usleep(10000);
+            printf("Odczytalem %d \n", licznik++);
         }
-        usleep(100000);
+        usleep(10000);
     }
 
     return 0;
