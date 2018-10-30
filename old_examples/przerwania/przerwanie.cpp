@@ -7,6 +7,7 @@
 #include <cstring>
 #include <unistd.h>
 #include <wiringPi.h>
+#include <softPwm.h>
 #define NUM_THREADS     2
 
 volatile int flag = 0;
