@@ -10,6 +10,9 @@
 #define NUM_THREADS     2
 
 volatile int flag = 0;
+volatile suseconds_t rise = 0;
+volatile suseconds_t fall = 0;
+volatile suseconds_t lrise = 0;
 
 //void* interrupt_monitor(void* param) {
 //    while(1) {
@@ -20,10 +23,16 @@ volatile int flag = 0;
 //}
 
 void myInterrupt(void) {
-    flag = 1;
+    struct timeval tv;
+    gettimeofday(&tv, NULL);
+    if(rise == 0) {
+        lrise = rise;
+        rise = tv.tv_usec;
+        flag = 1;
+    } else if (fall == 0) {
+        fall = tv.tv_usec;
+    }
 }
-
-
 
 int main (void)
 {
@@ -31,14 +40,19 @@ int main (void)
     if (wiringPiSetup () == -1)
         return 1 ;
 
+    const int PWM_PIN = 1;
+    const int INTERRUPT_PIN = 25;
     //pinMode (0, OUTPUT) ;         // aka BCM_GPIO pin 17 https://github.com/WiringPi/WiringPi/blob/master/examples/wfi.c
-    pinMode (25, INPUT);    // aka BCM  GPIO pin 26 , physical 37 https://pinout.xyz/pinout/pin37_gpio26#
-//
+    pinMode (INTERRUPT_PIN, INPUT);    // aka BCM  GPIO pin 26 , physical 37 https://pinout.xyz/pinout/pin37_gpio26#
+    pinMode (PWM_PIN, OUTPUT); // pin BCM 18/ pin PWM1, physical 12
+
+    softPwmCreate(PWM_PIN, 1, 100);
+    softPwmWrite(PWM_PIN, 30);
 //    pthread_t watek;
 //    if (pthread_create(&watek, NULL, interrupt_monitor, 0))
 //        printf("Error creating a thread.\n");
 
-    if ( wiringPiISR (25, INT_EDGE_BOTH, &myInterrupt) < 0 ) {
+    if ( wiringPiISR (INTERRUPT_PIN, INT_EDGE_BOTH, &myInterrupt) < 0 ) {
         printf ("Unable to setup ISR: %s\n", strerror (errno));
         return 1;
     }
@@ -47,7 +61,8 @@ int licznik=0;
         if(flag == 1) {
             flag = 0;
             usleep(10000);
-            printf("Odczytalem %d \n", licznik++);
+            printf("Odczytalem %d: od %d przez %d do %d\n high: %d low: %d, suma: %d",
+                   licznik++, lrise, fall, rise, fall-lrise, rise-fall, rise-lrise);
         }
         usleep(10000);
     }
