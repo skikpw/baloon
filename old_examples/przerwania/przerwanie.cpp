@@ -1,16 +1,18 @@
 
 #include <stdio.h>
 #include <cstdlib>
-//#include <pthread.h>
+//#include <pthready.h>
 #include <ctime>
 #include <cerrno>
 #include <cstring>
 #include <unistd.h>
 #include <wiringPi.h>
 #include <softPwm.h>
+#include <sys/time.h>
 #define NUM_THREADS     2
 
-volatile int flag = 0;
+volatile int ready = 0;
+volatile int rising = 0;
 volatile suseconds_t rise = 0;
 volatile suseconds_t fall = 0;
 volatile suseconds_t lrise = 0;
@@ -26,11 +28,13 @@ volatile suseconds_t lrise = 0;
 void myInterrupt(void) {
     struct timeval tv;
     gettimeofday(&tv, NULL);
-    if(rise == 0) {
+    if (rising) {
         lrise = rise;
-        rise = tv.tv_usec;
-        flag = 1;
-    } else if (fall == 0) {
+	rise = tv.tv_usec;
+	rising = !rising;
+        ready = 1;
+    } else {
+	rising = !rising;
         fall = tv.tv_usec;
     }
 }
@@ -49,9 +53,9 @@ int main (void)
 
     softPwmCreate(PWM_PIN, 1, 100);
     softPwmWrite(PWM_PIN, 30);
-//    pthread_t watek;
-//    if (pthread_create(&watek, NULL, interrupt_monitor, 0))
-//        printf("Error creating a thread.\n");
+//    pthready_t watek;
+//    if (pthready_create(&watek, NULL, interrupt_monitor, 0))
+//        printf("Error creating a thready.\n");
 
     if ( wiringPiISR (INTERRUPT_PIN, INT_EDGE_BOTH, &myInterrupt) < 0 ) {
         printf ("Unable to setup ISR: %s\n", strerror (errno));
@@ -59,13 +63,12 @@ int main (void)
     }
 int licznik=0;
     while(1) {
-        if(flag == 1) {
-            flag = 0;
-            usleep(10000);
-            printf("Odczytalem %d: od %d przez %d do %d\n high: %d low: %d, suma: %d",
+        if(ready == 1) {
+            ready = 0;
+            printf("Odczytalem %d: od %d przez %d do %d high: %d low: %d, suma: %d\n",
                    licznik++, lrise, fall, rise, fall-lrise, rise-fall, rise-lrise);
         }
-        usleep(10000);
+        //usleep(10000);
     }
 
     return 0;
