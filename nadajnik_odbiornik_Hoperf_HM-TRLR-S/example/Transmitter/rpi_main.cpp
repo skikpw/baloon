@@ -11,14 +11,15 @@
 #include "wiringSerial.h"
 #include "hoperf.hpp"
 #include "hoperf_pi_driver.hpp"
+#include <errno.h>
 
 #define UART_TX1 15
 #define UART_RX1 16
 #define HCONFIG 0
 #define HSLEEP 1
 #define HSTATUS 2
-#define HRESET 7
-
+#define HRESET 3
+extern int errno;
 //Treated as main
 int main()
 {
@@ -26,12 +27,20 @@ int main()
 	pinMode(UART_RX1, INPUT);
 	
 	int fd;
-    //if(fd = serialOpen("/dev/ttyS1", 9600)) printf("Error uart");
+    if((fd = serialOpen("/dev/ttyAMA0", 9600)) < 0) {
+		perror("Error with opening uart");
+//	    printf("Error uart");
+	}
+    else
+		serialClose(fd);
     skik::hoperf::ArduinoDriver drv("/dev/ttyAMA0", HCONFIG, HSLEEP, HSTATUS, HRESET);
-    skik::hoperf::RadioModule radio(drv, 9600);
 
+	skik::hoperf::Command c;
+    skik::hoperf::RadioModule radio(drv, 9600);
+	radio.writeCommand(c.kModulation, "2"); // FSK
     while(1){
-        radio.writeData("Testujemy");
+	printf("Write attempt...\n");
+        radio.writeData("Testujemy"); // za czesto - psuje
         delay(500);
     }
 }

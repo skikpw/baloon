@@ -103,6 +103,5 @@ void RadioModule::reset() const {
     //while(driver_.readPin(PinType::STATUS) == Level::HI);
     driver_.waitFor(2);
     driver_.writePin(PinType::RESET, Level::HI);
-    driver_.waitFor(13);
     //while(driver_.readPin(PinType::CONFIG) == Level::LO);
 }

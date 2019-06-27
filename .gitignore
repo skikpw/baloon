@@ -2,3 +2,4 @@
 cmake-build-debug*
 *.e
 *.swp
+**.o
