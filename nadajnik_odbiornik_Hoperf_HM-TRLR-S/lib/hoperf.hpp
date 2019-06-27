@@ -149,8 +149,8 @@ public:
     void readData(uint8_t* dest, size_t length) const;
     void readData(char* dest, size_t length) const;
     void reset() const;
+    DriverInterface& driver;
 private:
-    DriverInterface& driver_;
     bool is_sleeping_;
 };
 
